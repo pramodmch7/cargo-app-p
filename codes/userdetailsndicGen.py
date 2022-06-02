@@ -1,0 +1,19 @@
+def Convert(a, b):
+    Data = {}
+    Data['slno'] = a+1
+    Data['id'] = b.id
+    Data['un'] = b.HUsrUniqueNo
+    Data['FN'] = b.HUsrFirstName
+    Data['LN'] = b.HUsrLastName
+    Data['PH'] = b.HUsrPhone
+    Data['ADD'] = b.HUsrAddress
+    Data['EM'] = b.HUsrEmail
+    Data['LO'] = b.HUsrLocation
+    Data['AD'] = b.HUsrAdmin
+    Data['ACT'] = b.HUsrActive
+    Data['RI'] = b.HUsrRoleId
+    Data['RN'] = b.HUsrRoleName
+    Data['AV'] = b.HUsrAvatar
+    Data['CD'] = b.HUsrCreatedD
+    Data['CDT'] = b.HUsrCreatedDT
+    return Data
