@@ -32,9 +32,11 @@ def Login():
         # token = jwt.encode({'public_id': user.id, 'exp': datetime.datetime.utcnow(
         # ) + datetime.timedelta(seconds=5)}, app.config['SECRET_KEY'])
 
-        if user.HUsrAdmin == True:
-            return jsonify({'token': token, 'roles': [1001, 1002], 'user': user.HUsrEmail})
+        if user.HUsrAdmin == True and user.HUsrRoleName == 'Admin':
+            return jsonify({'token': token, 'roles': [1002, 1006], 'user': user.HUsrEmail})
+        elif user.HUsrRoleName == 'BusinessAdmin':
+            return jsonify({'token': token, 'roles': [1003], 'user': user.HUsrEmail})
         else:
-            return jsonify({'token': token, 'roles': [1002], 'user': user.HUsrEmail})
+            return jsonify({'token': token, 'roles': [1006], 'user': user.HUsrEmail})
 
     return jsonify({'message': 'Could not verify. Please try again', 'status': 601})
