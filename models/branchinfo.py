@@ -17,7 +17,7 @@ class BranchinfoDetails(db.Model):
     HBrUniqueNo = db.Column(db.String(64), unique=True)
     HBrName = db.Column(db.String(512), unique=False)
     HBrLocation = db.Column(db.String(256), unique=False)
-    HBrBranchCode = db.Column(db.String(128), unique=False)
+    HBrBranchCode = db.Column(db.String(128), unique=True)
     HBrAddress = db.Column(db.Text(), unique=False)
     HBrPhone = db.Column(db.String(64), unique=True)
     HBrLatitude = db.Column(db.Float(), unique=False)

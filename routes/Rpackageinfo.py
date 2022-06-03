@@ -23,7 +23,7 @@ from codes.AuthToken import token_required
 from codes.PDFData import pdfData
 from codes.GeneratePDF import GenPDF, PDF
 from codes.DownloadDoc import DownloadFile
-from codes.MakeRelation import Make_Relations, Make_Relations_Dlvr
+from codes.MakeRelation import Make_Relations, Make_Relations_Dlvr, Make_Relations_Update
 
 PackageinfoRoute = Blueprint('PackageinfoRoute', __name__)
 
@@ -148,7 +148,7 @@ def AddNewData(current_user):
         serialNo = f'{branch_code}00001'
     else:
         # sl_No = format(int(DBData[-1].HPkgLRNo[-5:]) + 1, '05d')
-        sl_No = format(int(DBData[-1].HPkgLRNo.split('-')[1]) + 1, '05d')
+        sl_No = format(int(len(DBData)) + 1, '05d')
         serialNo = f'{branch_code}{sl_No}'
 
     img = qrcode.make(UNumber)
@@ -272,8 +272,7 @@ def GetDefaultData(current_user):
         serialNo = f'{branch_code}00001'
     else:
         # sl_No = format(int(DBData[-1].HPkgLRNo[-5:]) + 1, '05d')
-        sl_No = format(int(DBData[-1].HPkgLRNo.split('-')[1]) + 1, '05d')
-        print(DBData[-1].HPkgLRNo)
+        sl_No = format(int(len(DBData)) + 1, '05d')
         serialNo = f'{branch_code}{sl_No}'
 
     data = {
@@ -428,6 +427,6 @@ def UpdateData(current_user, id):
 
         _comm = f"{float(data['hpkgtransportingcharges'])+float(data['hpkgloadingcharges'])-float(AdvanceAmt)} To Be Received By {data['hpkglocationto']}"
 
-        Make_Relations(Pid=id, Comm=_comm)
+        Make_Relations_Update(Pid=id, Comm=_comm)
 
     return{'status': 200, 'message': 'Data Updated', 'code': f'Update'}

@@ -43,6 +43,44 @@ def Make_Relations(Pid, Comm):
         COMBINE_BR_PK_INFO.saveDB(New_Combine)
 
 
+def Make_Relations_Update(Pid, Comm):
+
+    SelectPackage = COMBINE_BR_PK_INFO.getByPackageId(Pid)
+    CreatedPackage = PackageinfoDetails.getById(Pid)
+
+    if SelectPackage:
+        if CreatedPackage:
+            BFid = BranchinfoDetails.getByLocation(
+                CreatedPackage.HPkgLocationFrom).id
+            BTid = BranchinfoDetails.getByLocation(
+                CreatedPackage.HPkgLocationTo).id
+
+            PLR = CreatedPackage.HPkgLRNo
+            TA = float(CreatedPackage.HPkgTransportingCharges) + \
+                float(CreatedPackage.HPkgLoadingCharges)
+            print('TA')
+            print(TA)
+            print('TA')
+            AA = float(CreatedPackage.HPkgAdvanceAmount)
+            BA = TA - AA
+            BAR = CreatedPackage.HPkgBalAmtReceived
+            CD = CreatedPackage.HPkgUpdatedD
+
+            SelectPackage.PackageLRNo = PLR
+            SelectPackage.PackageTA = TA
+            SelectPackage.PackageAA = AA
+            SelectPackage.PackageBA = BA
+            SelectPackage.PackageBAR = BAR
+            SelectPackage.PackageCD = CD
+            SelectPackage.idBranch = BFid
+            SelectPackage.idBranchF = BFid
+            SelectPackage.idBranchT = BTid
+            SelectPackage.idPackage = Pid
+            SelectPackage.Comments = Comm
+
+            COMBINE_BR_PK_INFO.updateDB(COMBINE_BR_PK_INFO)
+
+
 def Make_Relations_Dlvr(Pid, Comm):
 
     SelectPackage = COMBINE_BR_PK_INFO.getByPackageId(Pid)
