@@ -3,7 +3,8 @@ import datetime
 
 
 class UserdetailsnDetails(db.Model):
-    __tablename__ = 'userdetailsn_table'
+    __bind_key__ = 'userdb'
+    __tablename__ = 'users-komitla-t'
 
     id1 = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String, unique=True)

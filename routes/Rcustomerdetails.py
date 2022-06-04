@@ -6,6 +6,7 @@ from functools import wraps
 from datetime import datetime
 
 from models.customerdetails import *
+from models1.bckcustomerdetails import BckCustomerDetails
 from codes.AuthToken import token_required
 from codes.customerinfodicGen import Convert
 

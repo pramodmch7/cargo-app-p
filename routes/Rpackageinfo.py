@@ -14,10 +14,12 @@ from PyPDF2 import PdfFileMerger, PdfFileReader
 
 
 from models.packageinfo import *
-# from models.userdetailsn import UserdetailsnDetails
-# from models.transportationinfo import TransportationinfoDetails
 from models.customerdetails import CustomerDetails
 from models.branchinfo import BranchinfoDetails
+
+from models1.bckpackageinfo import BckPackageinfoDetails
+from models1.bckcustomerdetails import BckCustomerDetails
+
 from codes.packageinfodicGen import *
 from codes.AuthToken import token_required
 from codes.PDFData import pdfData
@@ -136,19 +138,20 @@ def AddNewData(current_user):
 
     UNumber = f'Pkg{len(PackageinfoDetails.getAll())+1}'
 
-    DBData = PackageinfoDetails.getbyBranch(current_user.HUsrLocation)
+    # DBData = PackageinfoDetails.getbyBranch(current_user.HUsrLocation)
     BranchData = BranchinfoDetails.getByLocation(current_user.HUsrLocation)
+    PkgData = PackageinfoDetails.getAllPkgLRAsc(current_user.HUsrLocation)
     branch_code = ''
     serialNo = None
 
     if BranchData:
         branch_code = f'{BranchData.HBrBranchCode}-'
 
-    if len(DBData) <= 0:
+    if len(PkgData) <= 0:
         serialNo = f'{branch_code}00001'
     else:
-        # sl_No = format(int(DBData[-1].HPkgLRNo[-5:]) + 1, '05d')
-        sl_No = format(int(len(DBData)) + 1, '05d')
+        sl_No = format(int(PkgData[-1].HPkgLRNo[-5:]) + 1, '05d')
+        # sl_No = format(int(len(PkgData)) + 1, '05d')
         serialNo = f'{branch_code}{sl_No}'
 
     img = qrcode.make(UNumber)
@@ -200,6 +203,37 @@ def AddNewData(current_user):
 
     PackageinfoDetails.saveDB(NewData)
 
+    NewData1 = BckPackageinfoDetails(
+        id=Id,
+        HPkgLRNo=serialNo,
+        # HPkgName=data['hpkgname'],
+        HPkgWeight=data['hpkgweight'],
+        HPkgFragile=data['hpkgfragile'],
+        HPkgCustomerFromName=data['hpkgcustomerfromname'],
+        HPkgLocationFrom=data['hpkglocationfrom'],
+        HPkgPhoneFrom=data['hpkgphonefrom'],
+        HPkgCustomerToName=data['hpkgcustomertoname'],
+        HPkgLocationTo=data['hpkglocationto'],
+        HPkgPhoneTo=data['hpkgphoneto'],
+        HPkgArticlesCount=data['hpkgarticlescount'],
+        HPkgTransportingCharges=data['hpkgtransportingcharges'],
+        HPkgLoadingCharges=data['hpkgloadingcharges'],
+        HPkgApproximateDeliveryDate=PackageDeliveryDate,
+        HPkgAdvanceAmount=AdvanceAmt,
+        HPkgBalanceAmount=float(data['hpkgtransportingcharges'])+float(
+            data['hpkgloadingcharges'])-float(AdvanceAmt),
+        HPkgStatusFrom=PackageStatus,
+        HPkgStatusCodeFrom=PackageStatusCode,
+        HPkgAllStatus=PackageAllStatus,
+        HPkgQrCode=img_str,
+        HPkgCreatedD=datetime.today().date(),
+        HPkgCreatedDT=datetime.today(),
+        HPkgCreatedBy=current_user.HUsrEmail,
+        HPkgSlipName=fileId
+    )
+
+    BckPackageinfoDetails.saveDB(NewData1)
+
     Data = pdfData(current_user, serialNo, AdvanceAmt, data)
 
     PDF()
@@ -220,6 +254,19 @@ def AddNewData(current_user):
 
     CustomerDetails.saveCustomer(NewCustomer)
 
+    NewCustomer1 = BckCustomerDetails(
+        id=CId,
+        HcustUniqueNo=f'CUST{Customers + 1}',
+        HcustName=data['hpkgcustomerfromname'],
+        HcustPhone=data['hpkgphonefrom'],
+        HcustStatus='From',
+        HcustLocation=data['hpkglocationfrom'],
+        HcustCreatedDate=datetime.today(),
+        HcustCreatedDateTime=datetime.now(),
+    )
+
+    BckCustomerDetails.saveCustomer(NewCustomer1)
+
     CId = str(ID.generate())
     Customers = len(CustomerDetails.getAllCustomer())
     NewCustomer = CustomerDetails(
@@ -234,6 +281,19 @@ def AddNewData(current_user):
     )
 
     CustomerDetails.saveCustomer(NewCustomer)
+
+    NewCustomer1 = BckCustomerDetails(
+        id=CId,
+        HcustUniqueNo=f'CUST{Customers + 1}',
+        HcustName=data['hpkgcustomertoname'],
+        HcustPhone=data['hpkgphoneto'],
+        HcustStatus='To',
+        HcustLocation=data['hpkglocationto'],
+        HcustCreatedDate=datetime.today(),
+        HcustCreatedDateTime=datetime.now(),
+    )
+
+    BckCustomerDetails.saveCustomer(NewCustomer1)
 
     _comm = f"{float(data['hpkgtransportingcharges'])+float(data['hpkgloadingcharges'])-float(AdvanceAmt)} To Be Received By {data['hpkglocationto']}"
 
@@ -261,18 +321,19 @@ def DownloadLSFile(current_user, id):
 def GetDefaultData(current_user):
     DBData = PackageinfoDetails.getbyBranch(current_user.HUsrLocation)
     BranchData = BranchinfoDetails.getByLocation(current_user.HUsrLocation)
+    PkgData = PackageinfoDetails.getAllPkgLRAsc(current_user.HUsrLocation)
     branch_code = ''
     serialNo = None
 
     if BranchData:
         branch_code = f'{BranchData.HBrBranchCode}-'
 
-    if len(DBData) <= 0:
+    if len(PkgData) <= 0:
         print('Yes Len of DB Data')
         serialNo = f'{branch_code}00001'
     else:
-        # sl_No = format(int(DBData[-1].HPkgLRNo[-5:]) + 1, '05d')
-        sl_No = format(int(len(DBData)) + 1, '05d')
+        sl_No = format(int(PkgData[-1].HPkgLRNo[-5:]) + 1, '05d')
+        # sl_No = format(int(len(PkgData)) + 1, '05d')
         serialNo = f'{branch_code}{sl_No}'
 
     data = {
@@ -293,6 +354,7 @@ def getBulkDispatchedPackages(current_user):
     for pkgDis in Data['data']:
 
         Package = PackageinfoDetails.getById(pkgDis['id'])
+        Package1 = BckPackageinfoDetails.getById(pkgDis['id'])
 
         PackageStatusCode = 7677
         PackageStatus = "Dispatched^Arriving"
@@ -314,6 +376,17 @@ def getBulkDispatchedPackages(current_user):
 
             PackageinfoDetails.updateDB(Package)
 
+            Package1.HPkgStatusFrom = PackageStatus
+            Package1.HPkgStatusCodeFrom = PackageStatusCode
+            Package1.HPkgAllStatus = PackageAllStatus
+            Package1.HPkgTravelsDetails = Data['SelectedTravel']['id']
+            Package1.HPkgVehicleDetails = Data['BusNumber']
+            Package1.HPkgDispatchD = datetime.today().date()
+            Package1.HPkgDispatchDT = PackageDispatchDate
+            Package1.HPkgDispatchBy = current_user.HUsrEmail
+
+            BckPackageinfoDetails.updateDB(Package1)
+
     return{'status': 200, 'message': 'Package has been dispatched', 'code': f'Dispatched'}
 
 
@@ -325,6 +398,7 @@ def getBulkTransitPackages(current_user):
     for pkgDis in Data['data']:
 
         Package = PackageinfoDetails.getById(pkgDis['id'])
+        Package1 = BckPackageinfoDetails.getById(pkgDis['id'])
 
         PackageStatusCode = 7678
         PackageStatus = "Arrived"
@@ -342,6 +416,15 @@ def getBulkTransitPackages(current_user):
 
             PackageinfoDetails.updateDB(Package)
 
+            Package1.HPkgStatusFrom = PackageStatus
+            Package1.HPkgStatusCodeFrom = PackageStatusCode
+            Package1.HPkgAllStatus = PackageAllStatus
+            Package1.HPkgArrivingD = datetime.today().date()
+            Package1.HPkgArrivingDT = PackageArrivedDate
+            Package1.HPkgArrivingBy = current_user.HUsrEmail
+
+            BckPackageinfoDetails.updateDB(Package1)
+
     return{'status': 200, 'message': 'Package Arrived', 'code': f'Arrived'}
 
 
@@ -353,6 +436,7 @@ def getBulkDeliverPackages(current_user):
     for pkgDis in Data['data']:
 
         Package = PackageinfoDetails.getById(pkgDis['id'])
+        Package1 = BckPackageinfoDetails.getById(pkgDis['id'])
 
         PackageStatusCode = 7679
         PackageStatus = "Delivered"
@@ -371,6 +455,17 @@ def getBulkDeliverPackages(current_user):
 
             PackageinfoDetails.updateDB(Package)
 
+            Package1.HPkgStatusFrom = PackageStatus
+            Package1.HPkgStatusCodeFrom = PackageStatusCode
+            Package1.HPkgAllStatus = PackageAllStatus
+            Package1.HPkgBalAmtReceived = Package1.HPkgBalanceAmount
+            Package1.HPkgBalanceAmount = 0
+            Package1.HPkgDeliveryD = datetime.today().date()
+            Package1.HPkgDeliveryDT = PackageDeliverDate
+            Package1.HPkgDeliveredBy = current_user.HUsrEmail
+
+            BckPackageinfoDetails.updateDB(Package1)
+
             _comm = f"{Package.HPkgBalanceAmount} Is Received By {Package.HPkgLocationTo}"
 
             Make_Relations_Dlvr(Pid=pkgDis['id'], Comm=_comm)
@@ -383,6 +478,7 @@ def getBulkDeliverPackages(current_user):
 def UpdateData(current_user, id):
     data = request.get_json()
     DBData = PackageinfoDetails.getById(id)
+    DBData1 = BckPackageinfoDetails.getById(id)
     fileId = str(ID.generate())
 
     serialNo = ''
@@ -419,6 +515,32 @@ def UpdateData(current_user, id):
         DBData.HPkgSlipName = fileId
 
         PackageinfoDetails.updateDB(PackageinfoDetails)
+
+        # DBData1.HPkgLRNo = data['hpkglrno']
+        DBData1.HPkgCustomerFromName = data['hpkgcustomerfromname']
+        DBData1.HPkgLocationFrom = data['hpkglocationfrom']
+        DBData1.HPkgPhoneFrom = data['hpkgphonefrom']
+        DBData1.HPkgFragile = data['hpkgfragile']
+        DBData1.HPkgCustomerToName = data['hpkgcustomertoname']
+        DBData1.HPkgLocationTo = data['hpkglocationto']
+        DBData1.HPkgPhoneTo = data['hpkgphoneto']
+        DBData1.HPkgArticlesCount = data['hpkgarticlescount']
+        DBData1.HPkgTransportingCharges = data['hpkgtransportingcharges']
+        DBData1.HPkgLoadingCharges = data['hpkgloadingcharges']
+        DBData1.HPkgApproximateDeliveryDate = PackageDeliveryDate
+        DBData1.HPkgAdvanceAmount = AdvanceAmt
+        DBData1.HPkgBalanceAmount = float(data['hpkgtransportingcharges'])+float(
+            data['hpkgloadingcharges'])-float(AdvanceAmt)
+        # DBData1.HPkgStatusFrom = data['hpkgstatusfrom']
+        # DBData1.HPkgStatusCodeFrom = data['hpkgstatuscodefrom']
+        # DBData1.HPkgAllStatus = data['hpkgallstatus']
+        # DBData1.HPkgQrCode = data['hpkgqrcode']
+        DBData1.HPkgUpdatedD = datetime.today().date()
+        DBData1.HPkgUpdatedDT = datetime.today()
+        DBData1.HPkgUpdatedBy = current_user.HUsrEmail
+        DBData1.HPkgSlipName = fileId
+
+        BckPackageinfoDetails.updateDB(BckPackageinfoDetails)
 
         Data = pdfData(current_user, DBData.HPkgLRNo, AdvanceAmt, data)
 

@@ -5,6 +5,7 @@ import uuid0 as ID
 import jwt
 
 from models.branchinfo import *
+from models1.bckbranchinfo import BckBranchinfoDetails
 from codes.branchinfodicGen import *
 from models.userdetailsn import UserdetailsnDetails
 from codes.AuthToken import token_required
@@ -66,6 +67,24 @@ def addBranch(current_user):
                                         HBrCreatedBy=current_user.HUsrEmail
                                         )
             BranchinfoDetails.saveDB(NewData)
+            # BckBranchinfoDetails.saveDB(NewData)
+            NewData1 = BckBranchinfoDetails(id=Id,
+                                            HBrUniqueNo=BrachCodeGen,
+                                            HBrName=data['hbrname'],
+                                            HBrLocation=data['hbrlocation'],
+                                            HBrBranchCode=data['hbrbranchcode'],
+                                            HBrAddress=data['hbraddress'],
+                                            HBrPhone=data['hbrphone'],
+                                            HBrLatitude=Latitude,
+                                            HBrLongitude=Longitude,
+                                            HBrAuthorizedUser=data['hbrauthorizeduser'],
+                                            HBrAuthorizedUserName=Authorised_User_Name,
+                                            HBrCreatedD=datetime.datetime.today().date(),
+                                            HBrCreatedDT=datetime.datetime.today(),
+                                            HBrCreatedBy=current_user.HUsrEmail
+                                            )
+
+            BckBranchinfoDetails.saveDB(NewData1)
 
             AUser = UserdetailsnDetails.getByEmail(data['hbrauthorizeduser'])
 
@@ -84,6 +103,7 @@ def addBranch(current_user):
 def updateBranch(current_user, id):
     data = request.get_json()
     DBData = BranchinfoDetails.getById(id)
+    DBData1 = BranchinfoDetails.getById(id)
     if DBData:
         Latitude = 0
         Longitude = 0
@@ -114,6 +134,21 @@ def updateBranch(current_user, id):
 
         BranchinfoDetails.updateDB(BranchinfoDetails)
 
+        DBData1.HBrName = data['hbrname']
+        DBData1.HBrLocation = data['hbrlocation']
+        DBData1.HBrBranchCode = data['hbrbranchcode']
+        DBData1.HBrAddress = data['hbraddress']
+        DBData1.HBrPhone = data['hbrphone']
+        DBData1.HBrLatitude = Latitude
+        DBData1.HBrLongitude = Longitude
+        DBData1.HBrAuthorizedUser = data['hbrauthorizeduser']
+        DBData1.HBrAuthorizedUserName = Authorised_User_Name
+        DBData1.UpdatedD = datetime.datetime.today().date()
+        DBData1.UpdatedDT = datetime.datetime.today()
+        DBData1.UpdatedBy = current_user.HUsrEmail
+
+        BckBranchinfoDetails.updateDB(BckBranchinfoDetails)
+
         AUser = UserdetailsnDetails.getByEmail(data['hbrauthorizeduser'])
 
         if AUser:
@@ -121,4 +156,29 @@ def updateBranch(current_user, id):
             AUser.HUsrLocation = data['hbrlocation']
             UserdetailsnDetails.updateDB(AUser)
         return{'status': 200, 'message': 'Branch Updated', 'code': f'Updated'}
+    return{'status': 200, 'message': 'Something Went Wrong', 'code': f'Error'}
+
+
+@BranchinfoRoute.route('/api/dbr/<id>', methods=['PUT'])
+@token_required
+def dissableBranch(current_user, id):
+    data = request.get_json()
+    DBData = BranchinfoDetails.getById(id)
+    DBData1 = BranchinfoDetails.getById(id)
+    if DBData:
+        DBData.Deleted = True
+        DBData.UpdatedD = datetime.datetime.today().date()
+        DBData.UpdatedDT = datetime.datetime.today()
+        DBData.UpdatedBy = current_user.HUsrEmail
+
+        BranchinfoDetails.updateDB(BranchinfoDetails)
+
+        DBData1.Deleted = True
+        DBData1.UpdatedD = datetime.datetime.today().date()
+        DBData1.UpdatedDT = datetime.datetime.today()
+        DBData1.UpdatedBy = current_user.HUsrEmail
+
+        BckBranchinfoDetails.updateDB(BckBranchinfoDetails)
+
+        return{'status': 200, 'message': 'Branch Dissabled', 'code': f'Dissable'}
     return{'status': 200, 'message': 'Something Went Wrong', 'code': f'Error'}

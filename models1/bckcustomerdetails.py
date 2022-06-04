@@ -2,8 +2,9 @@ from db import db
 import datetime
 
 
-class CustomerDetails(db.Model):
-    __tablename__ = 'customer_details'
+class BckCustomerDetails(db.Model):
+    __bind_key__ = 'bckkomitladb'
+    __tablename__ = 'customer_details_bck'
 
     id1 = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String, unique=True)

@@ -3,8 +3,9 @@ from db import db
 import datetime
 
 
-class PackageinfoDetails(db.Model):
-    __tablename__ = 'packageinfo_table'
+class BckPackageinfoDetails(db.Model):
+    __bind_key__ = 'bckkomitladb'
+    __tablename__ = 'packageinfo_table_bck'
 
     id1 = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String, unique=True)
@@ -143,10 +144,6 @@ class PackageinfoDetails(db.Model):
     @classmethod
     def getBranchGroups(cls, fdate, ldate):
         return cls.query.filter(cls.HPkgCreatedD.between(fdate, ldate)).group_by(cls.HPkgLocationFrom).all()
-
-    @classmethod
-    def getAllPkgLRAsc(cls, _Branch):
-        return cls.query.filter_by(HPkgLocationFrom=_Branch).order_by(cls.HPkgLRNo.asc()).all()
 
     # @classmethod
     # def getBikeCount(cls):

@@ -2,8 +2,9 @@ from db import db
 import datetime
 
 
-class BranchinfoDetails(db.Model):
-    __tablename__ = 'branchinfo_table'
+class BckBranchinfoDetails(db.Model):
+    __bind_key__ = 'bckkomitladb'
+    __tablename__ = 'branchinfo_table_bck'
 
     id1 = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String, unique=True)
