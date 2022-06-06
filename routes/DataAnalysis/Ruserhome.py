@@ -52,6 +52,8 @@ def GetAll(current_user):
                         'HHUCustomerToLocation': _data.HPkgLocationTo,
                         'HHUStatus': _data.HPkgAllStatus,
                         'HHUBalanceAmt': (_data.HPkgTransportingCharges + _data.HPkgLoadingCharges) - (_data.HPkgAdvanceAmount + _data.HPkgBalAmtReceived),
+                        'HPkgTotalAmount': (_data.HPkgTransportingCharges + _data.HPkgLoadingCharges),
+                        'HPkgAdvanceAmount': (_data.HPkgAdvanceAmount),
                         'Pkgfragil': _data.HPkgFragile,
                     }
                 )
@@ -73,6 +75,8 @@ def GetAll(current_user):
                         'HHUCustomerToLocation': _data.HPkgLocationTo,
                         'HHUStatus': _data.HPkgAllStatus,
                         'HHUBalanceAmt': (_data.HPkgTransportingCharges + _data.HPkgLoadingCharges) - (_data.HPkgAdvanceAmount + _data.HPkgBalAmtReceived),
+                        'HPkgTotalAmount': (_data.HPkgTransportingCharges + _data.HPkgLoadingCharges),
+                        'HPkgAdvanceAmount': (_data.HPkgAdvanceAmount),
                         'Pkgfragil': _data.HPkgFragile,
                     }
                 )
@@ -94,6 +98,8 @@ def GetAll(current_user):
                         'HHUCustomerToLocation': _data.HPkgLocationTo,
                         'HHUStatus': _data.HPkgAllStatus,
                         'HHUBalanceAmt': (_data.HPkgTransportingCharges + _data.HPkgLoadingCharges) - (_data.HPkgAdvanceAmount + _data.HPkgBalAmtReceived),
+                        'HPkgTotalAmount': (_data.HPkgTransportingCharges + _data.HPkgLoadingCharges),
+                        'HPkgAdvanceAmount': (_data.HPkgAdvanceAmount),
                         'Pkgfragil': _data.HPkgFragile,
                     }
                 )

@@ -19,8 +19,9 @@ def GetAllTravel(current_user):
     DBData = TransportationinfoDetails.getAll()
     data = []
     for index, _data in enumerate(DBData):
-        Data = Convert(index, _data)
-        data.append(Data)
+        if not _data.Deleted:
+            Data = Convert(index, _data)
+            data.append(Data)
     return{'message': data, 'status': 200}
 
 
@@ -69,3 +70,26 @@ def UpdateTravels(current_user, id):
         BckTransportationinfoDetails.updateDB(BckTransportationinfoDetails)
 
     return{'status': 200, 'message': 'Travel Updated', 'code': f'Update'}
+
+
+@TransportationinfoRoute.route('/api/dtrs/<id>', methods=['PUT'])
+@token_required
+def DissableTravels(current_user, id):
+    data = request.get_json()
+    DBData = TransportationinfoDetails.getById(id)
+    DBData1 = BckTransportationinfoDetails.getById(id)
+
+    if DBData:
+        DBData.Deleted = True
+        DBData.UpdatedD = datetime.datetime.today().date()
+        DBData.UpdatedDT = datetime.datetime.today()
+        DBData.UpdatedBy = current_user.HUsrEmail
+        TransportationinfoDetails.updateDB(TransportationinfoDetails)
+
+        DBData1.Deleted = True
+        DBData1.UpdatedD = datetime.datetime.today().date()
+        DBData1.UpdatedDT = datetime.datetime.today()
+        DBData1.UpdatedBy = current_user.HUsrEmail
+        BckTransportationinfoDetails.updateDB(BckTransportationinfoDetails)
+
+    return{'status': 200, 'message': 'Travel Deleted', 'code': f'Deleted'}

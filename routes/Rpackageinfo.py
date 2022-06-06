@@ -144,15 +144,25 @@ def AddNewData(current_user):
     branch_code = ''
     serialNo = None
 
-    if BranchData:
+    if BranchData and BranchData.Deleted != True:
         branch_code = f'{BranchData.HBrBranchCode}-'
+    else:
+        branch_code = 'NA'
 
     if len(PkgData) <= 0:
-        serialNo = f'{branch_code}00001'
+        # print('Yes Len of DB Data')
+        if branch_code != 'NA':
+            serialNo = f'{branch_code}00001'
+        else:
+            serialNo = 'NA'
     else:
-        sl_No = format(int(PkgData[-1].HPkgLRNo[-5:]) + 1, '05d')
-        # sl_No = format(int(len(PkgData)) + 1, '05d')
-        serialNo = f'{branch_code}{sl_No}'
+        if branch_code != 'NA':
+            serialNo = f'{branch_code}00001'
+            sl_No = format(int(PkgData[-1].HPkgLRNo[-5:]) + 1, '05d')
+            # sl_No = format(int(len(PkgData)) + 1, '05d')
+            serialNo = f'{branch_code}{sl_No}'
+        else:
+            serialNo = 'NA'
 
     img = qrcode.make(UNumber)
 
@@ -325,16 +335,25 @@ def GetDefaultData(current_user):
     branch_code = ''
     serialNo = None
 
-    if BranchData:
+    if BranchData and BranchData.Deleted != True:
         branch_code = f'{BranchData.HBrBranchCode}-'
+    else:
+        branch_code = 'NA'
 
     if len(PkgData) <= 0:
-        print('Yes Len of DB Data')
-        serialNo = f'{branch_code}00001'
+        # print('Yes Len of DB Data')
+        if branch_code != 'NA':
+            serialNo = f'{branch_code}00001'
+        else:
+            serialNo = 'NA'
     else:
-        sl_No = format(int(PkgData[-1].HPkgLRNo[-5:]) + 1, '05d')
-        # sl_No = format(int(len(PkgData)) + 1, '05d')
-        serialNo = f'{branch_code}{sl_No}'
+        if branch_code != 'NA':
+            serialNo = f'{branch_code}00001'
+            sl_No = format(int(PkgData[-1].HPkgLRNo[-5:]) + 1, '05d')
+            # sl_No = format(int(len(PkgData)) + 1, '05d')
+            serialNo = f'{branch_code}{sl_No}'
+        else:
+            serialNo = 'NA'
 
     data = {
         'ledserno': serialNo,
@@ -466,7 +485,7 @@ def getBulkDeliverPackages(current_user):
 
             BckPackageinfoDetails.updateDB(Package1)
 
-            _comm = f"{Package.HPkgBalanceAmount} Is Received By {Package.HPkgLocationTo}"
+            _comm = f"{Package.HPkgBalAmtReceived} Was Received In {Package.HPkgLocationTo}"
 
             Make_Relations_Dlvr(Pid=pkgDis['id'], Comm=_comm)
 

@@ -19,8 +19,9 @@ def getBranchs(current_user):
     DBData = BranchinfoDetails.getAll()
     data = []
     for index, _data in enumerate(DBData):
-        Data = Convert(index, _data)
-        data.append(Data)
+        if not _data.Deleted:
+            Data = Convert(index, _data)
+            data.append(Data)
     return{'message': data, 'status': 200}
 
 
@@ -103,7 +104,7 @@ def addBranch(current_user):
 def updateBranch(current_user, id):
     data = request.get_json()
     DBData = BranchinfoDetails.getById(id)
-    DBData1 = BranchinfoDetails.getById(id)
+    DBData1 = BckBranchinfoDetails.getById(id)
     if DBData:
         Latitude = 0
         Longitude = 0
@@ -164,9 +165,11 @@ def updateBranch(current_user, id):
 def dissableBranch(current_user, id):
     data = request.get_json()
     DBData = BranchinfoDetails.getById(id)
-    DBData1 = BranchinfoDetails.getById(id)
+    DBData1 = BckBranchinfoDetails.getById(id)
     if DBData:
         DBData.Deleted = True
+        DBData.HBrAuthorizedUser = ''
+        DBData.HBrAuthorizedUserName = ''
         DBData.UpdatedD = datetime.datetime.today().date()
         DBData.UpdatedDT = datetime.datetime.today()
         DBData.UpdatedBy = current_user.HUsrEmail
@@ -174,11 +177,20 @@ def dissableBranch(current_user, id):
         BranchinfoDetails.updateDB(BranchinfoDetails)
 
         DBData1.Deleted = True
+        DBData1.HBrAuthorizedUser = ''
+        DBData1.HBrAuthorizedUserName = ''
         DBData1.UpdatedD = datetime.datetime.today().date()
         DBData1.UpdatedDT = datetime.datetime.today()
         DBData1.UpdatedBy = current_user.HUsrEmail
 
         BckBranchinfoDetails.updateDB(BckBranchinfoDetails)
+
+        AUser = UserdetailsnDetails.getByEmail(DBData.HBrAuthorizedUser)
+
+        if AUser:
+            # print('Successfuly Got Search User Name Email form DB')
+            AUser.HUsrLocation = ''
+            UserdetailsnDetails.updateDB(AUser)
 
         return{'status': 200, 'message': 'Branch Dissabled', 'code': f'Dissable'}
     return{'status': 200, 'message': 'Something Went Wrong', 'code': f'Error'}
